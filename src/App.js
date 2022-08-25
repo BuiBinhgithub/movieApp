@@ -1,25 +1,43 @@
-import logo from './logo.svg';
-import './App.css';
+import "antd/dist/antd.variable.min.css";
+import React, { useState } from "react";
+import { Row, Col, Input } from "antd";
+import SearchMovie from "./components/Search";
+import ListDataMovie from "./components/List";
+import LayoutMovie from "./components/Layout";
+import PaginationMovie from "./components/Pagination";
+import { api } from "./services/api";
+import axios from "axios";
 
-function App() {
+const App = () => {
+  const [loading, setLoading] = useState(false);
+  const [name, setName] = useState("");
+  const [movies, setMovies] = useState([]);
+
+  const searchData = async (Keyword = "") => {
+    //cap nhat state loading
+    setLoading(true); //bat dau tim kiem
+    if (Keyword !== "") {
+      //cap nhat state keyword
+      setName(Keyword);
+      //call api
+      const data = await api.searchDataMovieByKeyword(Keyword);
+      setMovies(data.Search);
+    }
+    setLoading(false);
+  };
+  //ngung tim kiem
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <LayoutMovie>
+      <SearchMovie loading={loading} search={searchData} />
+      {movies.length > 0 && (
+        <>
+          <ListDataMovie movies={movies} /> 
+          <PaginationMovie />
+        </>
+      )}
+    </LayoutMovie>
   );
-}
+};
 
 export default App;
